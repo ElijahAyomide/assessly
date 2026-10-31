@@ -98,7 +98,7 @@ export default function StudentImportModal({ students, onImported, onClose }) {
     <Modal title="Import students from Excel" onClose={onClose} width={620}>
       <div className="quick-add-form">
         <div className="field-hint" style={{ marginTop: 0 }}>
-          Add many students at once. Download the template, fill in one student per row (up to {MAX_IMPORT_ROWS}), then upload it here.
+          Add many students at once. Download the template, fill in each student's name and class, one student per row (up to {MAX_IMPORT_ROWS}), then upload it here.
           {' '}<button type="button" className="template-download-link" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }} onClick={() => downloadStudentTemplate(classRows)}>
             <Download size={11} /> Download the template
           </button>
@@ -130,7 +130,7 @@ export default function StudentImportModal({ students, onImported, onClose }) {
             <div className="import-preview">
               <table className="data-table">
                 <thead>
-                  <tr><th>#</th><th>Name</th><th>Username</th><th>Class</th><th>Subjects</th><th>Password</th></tr>
+                  <tr><th>#</th><th>Name</th><th>Username</th><th>Class</th><th>Password</th></tr>
                 </thead>
                 <tbody>
                   {previewRows.map(st => (
@@ -139,7 +139,6 @@ export default function StudentImportModal({ students, onImported, onClose }) {
                       <td className="cell-strong">{st.name}</td>
                       <td className="cell-dim-sm">{st.previewUsername}</td>
                       <td>{st.class}</td>
-                      <td className="cell-dim-sm">{st.subjects.length} subject{st.subjects.length === 1 ? '' : 's'}</td>
                       <td className="cell-dim-sm">{st.surname}</td>
                     </tr>
                   ))}
