@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useSchoolCodeCheck } from '../lib/useSchoolCodeCheck';
 import PasswordInput from '../components/PasswordInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, MailCheck, ArrowRight } from 'lucide-react';
@@ -47,9 +46,6 @@ export default function Login() {
   const [studentChecking, setStudentChecking] = useState(false);
 
   const [registerForm, setRegisterForm] = useState(EMPTY_REGISTER);
-  const [codeTakenNow, setCodeTakenNow] = useState(false); // found at submit time
-  const codeStatus = useSchoolCodeCheck(registerForm.code);
-  const codeTaken = codeStatus === 'taken' || (codeTakenNow && codeStatus !== 'free');
   const [registerError, setRegisterError] = useState('');
   const [registering, setRegistering] = useState(false);
 
@@ -112,9 +108,9 @@ export default function Login() {
     e.preventDefault();
     setStudentError('');
     const username = studentUsername.trim();
-    const surname = studentPassword.trim(); // the student's first name, e.g. Elijah
+    const surname = studentPassword.trim();
     if (!username || !surname) {
-      setStudentError('Enter your username and password.');
+      setStudentError('Enter your username and surname.');
       return;
     }
     setStudentChecking(true);
@@ -146,7 +142,6 @@ export default function Login() {
       setRegisterError('Passwords do not match.');
       return;
     }
-    if (codeTaken) return;
     if (!registerForm.agree) {
       setRegisterError('Please agree to the Terms of service and Privacy policy to continue.');
       return;
@@ -167,8 +162,7 @@ export default function Login() {
       // Check the code now, so nobody confirms their email and then finds the
       // school couldn't be created.
       if (await schoolCodeTaken(profile.code)) {
-        setRegisterError('');
-        setCodeTakenNow(true);
+        setRegisterError('That school code is already used by another school. Please choose a different one.');
         return;
       }
       const { user, session } = await signUpAdmin(profile.email, registerForm.password, profile);
@@ -207,7 +201,7 @@ export default function Login() {
     signin: { eyebrow: 'School workspace', title: 'Welcome back', sub: 'Sign in to manage your students and pick up where you left off.' },
     register: { eyebrow: 'Get started with Assessly', title: 'Create your account', sub: 'Set up your school workspace and make your next test a little simpler.' },
     forgot: { eyebrow: 'Password help', title: 'Reset your password', sub: "Enter the email you registered with and we'll send you a link to choose a new password." },
-    student: { eyebrow: 'Student portal', title: 'Student sign in', sub: 'Use the username and password your school gave you. Your password is your first name, with a capital first letter (for example Elijah).' },
+    student: { eyebrow: 'Student portal', title: 'Student sign in', sub: 'Use the username and surname your school gave you.' },
   }[view];
 
   const setReg = (patch) => setRegisterForm({ ...registerForm, ...patch });
@@ -302,8 +296,7 @@ export default function Login() {
                 <div className="form-row-2">
                   <div className="field">
                     <label>School code</label>
-                    <input type="text" placeholder="Enter your school code" value={registerForm.code} onChange={e => { setCodeTakenNow(false); setReg({ code: e.target.value }); }} aria-invalid={codeTaken} style={codeTaken ? { borderColor: '#D92D20' } : undefined} />
-                    {codeTaken && <div className="field-error-red" role="alert">Already used. Please choose a different school code.</div>}
+                    <input type="text" placeholder="Enter your school code" value={registerForm.code} onChange={e => setReg({ code: e.target.value })} />
                   </div>
                   <div className="field">
                     <label>Phone number</label>
@@ -345,8 +338,8 @@ export default function Login() {
                   <input type="text" placeholder="GVC/2026/001" value={studentUsername} onChange={e => setStudentUsername(e.target.value)} />
                 </div>
                 <div className="field">
-                  <label>Password (your first name)</label>
-                  <PasswordInput slashWhenHidden placeholder="e.g. Elijah" value={studentPassword} onChange={e => setStudentPassword(e.target.value)} />
+                  <label>Password (surname)</label>
+                  <PasswordInput slashWhenHidden placeholder="e.g. Okafor" value={studentPassword} onChange={e => setStudentPassword(e.target.value)} />
                 </div>
                 {studentError && <div className="error-text">{studentError}</div>}
                 <button type="submit" className="auth-submit" disabled={studentChecking}>
@@ -354,7 +347,7 @@ export default function Login() {
                 </button>
                 <div className="student-portal-notice">
                   <GraduationCap size={16} />
-                  <span>Your username is given to you by your school admin. Your password is your first name, capital first letter then small letters (Elijah). You don't need to register.</span>
+                  <span>Your username and surname are given to you by your school admin — you don't need to register.</span>
                 </div>
               </form>
             )}

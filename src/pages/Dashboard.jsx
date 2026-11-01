@@ -14,7 +14,6 @@ import { createStudent, updateStudent, deleteStudent } from '../lib/students';
 import { createAssignments, replaceAssignments } from '../lib/assignments';
 import { deductLicense } from '../lib/license';
 import { buildActivity } from '../lib/activity';
-import { passwordFromName } from '../lib/studentPassword';
 import { nextUsername, studentSequence, statusLabel, statusBadgeTone, DURATION_OPTIONS } from '../data/mockData';
 
 export default function Dashboard({ students, setStudents, questions, setQuestions, results, license, setLicense }) {
@@ -206,7 +205,7 @@ export default function Dashboard({ students, setStudents, questions, setQuestio
     setAddError('');
     try {
       const username = nextUsername(studentSequence(students), form.class, school.code);
-      const surname = passwordFromName(form.name);
+      const surname = form.name.trim().split(' ').slice(-1)[0];
       const saved = await createStudent(school.id, {
         name: form.name.trim(), username, surname,
         class: form.class, subjects: form.subjects, status: 'pending',

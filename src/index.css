@@ -1,4 +1,4 @@
-git/* ============================================
+/* ============================================
    DESIGN TOKENS
    ============================================ */
 :root {
@@ -1847,6 +1847,3 @@ body:has(.sp-exam-screen) { background: #EEF0F9; }
 .assign-q-wide { width: 100%; justify-content: center; }
 .assign-q-wide b { font-weight: 700; }
 @media (max-width: 720px) { .search-result-row .row-actions { flex-wrap: wrap; justify-content: flex-end; } }
-
-/* Red alert shown under a field (e.g. school code already used). */
-.field-error-red { margin-top: 0.4em; color: #D92D20; font-size: 0.8em; font-weight: 600; line-height: 1.4; }

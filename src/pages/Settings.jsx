@@ -10,8 +10,6 @@ import { NIGERIAN_STATES } from '../data/mockData';
 import ClassesSubjectsPanel from '../components/ClassesSubjectsPanel';
 import { signInAdmin, changePassword, signOutAdmin } from '../lib/auth';
 import { forgetActivity } from '../lib/idleLogout';
-import { schoolCodeTaken } from '../lib/schools';
-import { useSchoolCodeCheck } from '../lib/useSchoolCodeCheck';
 import { prepareLogo, uploadLogo, removeOldLogos } from '../lib/logo';
 
 const SUPPORT_EMAIL = import.meta.env.VITE_SUPPORT_EMAIL || '';
@@ -38,19 +36,11 @@ export default function Settings({ license }) {
   const [pendingLogo, setPendingLogo] = useState(null); // { blob, preview }
   useEffect(() => () => { if (pendingLogo) URL.revokeObjectURL(pendingLogo.preview); }, [pendingLogo]);
 
-  const codeTaken = useSchoolCodeCheck(draft.code, school.code) === 'taken';
-
   const submitProfile = async (e) => {
     e.preventDefault();
-    if (codeTaken) return;
     setSaving(true);
     setError('');
     try {
-      if (draft.code.trim().toUpperCase() !== String(school.code || '').toUpperCase() && await schoolCodeTaken(draft.code.trim().toUpperCase())) {
-        setSaving(false);
-        setError('That school code is already used by another school. Please choose a different one.');
-        return;
-      }
       let toSave = draft;
       if (pendingLogo) {
         const url = await uploadLogo(school.id, pendingLogo.blob);
@@ -225,8 +215,7 @@ export default function Settings({ license }) {
             </div>
             <div className="field">
               <label>School code</label>
-              <input type="text" value={draft.code} onChange={e => setDraft({ ...draft, code: e.target.value })} aria-invalid={codeTaken} style={codeTaken ? { borderColor: '#D92D20' } : undefined} />
-              {codeTaken && <div className="field-error-red" role="alert">Already used. Please choose a different school code.</div>}
+              <input type="text" value={draft.code} onChange={e => setDraft({ ...draft, code: e.target.value })} />
               <div className="field-hint">Used as the prefix for student usernames, e.g. {draft.code}/2026/001</div>
             </div>
             <div className="field">
