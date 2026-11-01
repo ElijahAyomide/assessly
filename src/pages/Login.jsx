@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAvailabilityCheck, alertStyle, redBorder } from '../lib/useAvailabilityCheck';
 import PasswordInput from '../components/PasswordInput';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, MailCheck, ArrowRight } from 'lucide-react';
@@ -8,7 +9,7 @@ import { SIGNOUT_REASON_KEY } from '../lib/idleLogout';
 import { useSchool } from '../context/SchoolContext';
 import { useStudentSession } from '../context/StudentSessionContext';
 import { signUpAdmin, signInAdmin, requestPasswordReset, resendConfirmation } from '../lib/auth';
-import { claimOrCreateSchool, schoolCodeTaken } from '../lib/schools';
+import { claimOrCreateSchool, schoolCodeTaken, schoolEmailTaken } from '../lib/schools';
 import { studentApi } from '../lib/studentApi';
 import { setRememberChoice } from '../lib/rememberMe';
 
@@ -46,6 +47,13 @@ export default function Login() {
   const [studentChecking, setStudentChecking] = useState(false);
 
   const [registerForm, setRegisterForm] = useState(EMPTY_REGISTER);
+  // Live checks while the new school fills in the form.
+  const [codeUsedNow, setCodeUsedNow] = useState(false);   // found when pressing Create account
+  const [emailUsedNow, setEmailUsedNow] = useState(false);
+  const codeCheck = useAvailabilityCheck(registerForm.code, c => schoolCodeTaken(c.toUpperCase()));
+  const emailCheck = useAvailabilityCheck(registerForm.email, schoolEmailTaken);
+  const codeUsed = codeCheck === 'taken' || (codeUsedNow && codeCheck !== 'free');
+  const emailUsed = emailCheck === 'taken' || (emailUsedNow && emailCheck !== 'free');
   const [registerError, setRegisterError] = useState('');
   const [registering, setRegistering] = useState(false);
 
@@ -142,6 +150,7 @@ export default function Login() {
       setRegisterError('Passwords do not match.');
       return;
     }
+    if (codeUsed || emailUsed) return; // the red message under the box says why
     if (!registerForm.agree) {
       setRegisterError('Please agree to the Terms of service and Privacy policy to continue.');
       return;
@@ -161,11 +170,16 @@ export default function Login() {
       };
       // Check the code now, so nobody confirms their email and then finds the
       // school couldn't be created.
-      if (await schoolCodeTaken(profile.code)) {
-        setRegisterError('That school code is already used by another school. Please choose a different one.');
-        return;
+      if (await schoolCodeTaken(profile.code)) { setCodeUsedNow(true); return; }
+      if (await schoolEmailTaken(profile.email)) { setEmailUsedNow(true); return; }
+      let signedUp;
+      try {
+        signedUp = await signUpAdmin(profile.email, registerForm.password, profile);
+      } catch (err) {
+        if (/already (exists|registered)/i.test(err.message || '')) { setEmailUsedNow(true); return; }
+        throw err;
       }
-      const { user, session } = await signUpAdmin(profile.email, registerForm.password, profile);
+      const { user, session } = signedUp;
 
       if (session) {
         // Email confirmation is off in Supabase: they're signed in already.
@@ -296,7 +310,8 @@ export default function Login() {
                 <div className="form-row-2">
                   <div className="field">
                     <label>School code</label>
-                    <input type="text" placeholder="Enter your school code" value={registerForm.code} onChange={e => setReg({ code: e.target.value })} />
+                    <input type="text" placeholder="any 3 letters from school name" value={registerForm.code} style={codeUsed ? redBorder : undefined} onChange={e => { setCodeUsedNow(false); setReg({ code: e.target.value }); }} />
+                    {codeUsed && <div role="alert" style={alertStyle}>Already used</div>}
                   </div>
                   <div className="field">
                     <label>Phone number</label>
@@ -305,7 +320,8 @@ export default function Login() {
                 </div>
                 <div className="field">
                   <label>Email address</label>
-                  <input type="email" placeholder="you@school.edu" autoComplete="email" value={registerForm.email} onChange={e => setReg({ email: e.target.value })} />
+                  <input type="email" placeholder="you@school.edu" autoComplete="email" value={registerForm.email} style={emailUsed ? redBorder : undefined} onChange={e => { setEmailUsedNow(false); setReg({ email: e.target.value }); }} />
+                  {emailUsed && <div role="alert" style={alertStyle}>This email has already been used. Please use a different email, or sign in instead.</div>}
                 </div>
                 <div className="form-row-2">
                   <div className="field">

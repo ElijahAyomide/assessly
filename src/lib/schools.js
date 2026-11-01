@@ -105,6 +105,15 @@ export async function claimOrCreateSchool(userId, details) {
 }
 
 
+// True if a school already registered with this email (school profiles are public).
+export async function schoolEmailTaken(email) {
+  const e = String(email || '').trim().replace(/[\\%_]/g, m => '\\' + m);
+  const { data, error } = await supabase
+    .from('schools').select('id').ilike('email', e).limit(1).maybeSingle();
+  if (error) throw error;
+  return !!data;
+}
+
 // True if another school already uses this code (school profiles are public).
 export async function schoolCodeTaken(code) {
   const { data, error } = await supabase
