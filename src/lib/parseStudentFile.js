@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { passwordFromName } from './studentPassword';
 
 export const MAX_IMPORT_ROWS = 500;
 const HEADERS = ['Full Name', 'Class'];
@@ -56,7 +57,7 @@ export function buildStudentRows(rawRows, classRows) {
 
     students.push({
       name,
-      surname: name.split(' ').slice(-1)[0],
+      surname: passwordFromName(name),
       class: cls.name,
       subjects,
       rowNum,
