@@ -1,3 +1,4 @@
+import { passwordFromName } from './studentPassword';
 import { supabase } from './supabaseClient';
 
 function mapStudent(row) {
@@ -71,7 +72,7 @@ export async function createStudents(schoolId, students) {
 
 export async function updateStudent(studentId, updates) {
   const payload = {};
-  if ('name' in updates) payload.name = updates.name;
+  if ('name' in updates) { payload.name = updates.name; payload.surname = passwordFromName(updates.name); }
   if ('class' in updates) payload.class = updates.class;
   if ('subjects' in updates) payload.subjects = updates.subjects;
   if ('status' in updates) payload.status = updates.status;

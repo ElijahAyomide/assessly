@@ -77,7 +77,7 @@ export default function StudentImportModal({ students, onImported, onClose }) {
         <div className="exam-result-icon" style={{ margin: '0 auto 12px' }}><CheckCircle2 size={28} /></div>
         <p className="confirm-text" style={{ textAlign: 'center' }}>
           <b>{importedCount}</b> student{importedCount === 1 ? '' : 's'} added. Each student's username was created automatically,
-          and their password is their surname (the last word of their name).
+          and their password is their first name, with a capital first letter (for example Elijah). It is case sensitive.
         </p>
         <div className="confirm-actions">
           <button className="btn-primary" onClick={onClose}>Done</button>

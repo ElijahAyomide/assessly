@@ -118,7 +118,7 @@ export default function Login() {
     const username = studentUsername.trim();
     const surname = studentPassword.trim();
     if (!username || !surname) {
-      setStudentError('Enter your username and surname.');
+      setStudentError('Enter your username and password.');
       return;
     }
     setStudentChecking(true);
@@ -215,7 +215,7 @@ export default function Login() {
     signin: { eyebrow: 'School workspace', title: 'Welcome back', sub: 'Sign in to manage your students and pick up where you left off.' },
     register: { eyebrow: 'Get started with Assessly', title: 'Create your account', sub: 'Set up your school workspace and make your next test a little simpler.' },
     forgot: { eyebrow: 'Password help', title: 'Reset your password', sub: "Enter the email you registered with and we'll send you a link to choose a new password." },
-    student: { eyebrow: 'Student portal', title: 'Student sign in', sub: 'Use the username and surname your school gave you.' },
+    student: { eyebrow: 'Student portal', title: 'Student sign in', sub: 'Use the username and password your school gave you. Your password is your first name, with a capital first letter (for example Elijah).' },
   }[view];
 
   const setReg = (patch) => setRegisterForm({ ...registerForm, ...patch });
@@ -354,8 +354,8 @@ export default function Login() {
                   <input type="text" placeholder="GVC/2026/001" value={studentUsername} onChange={e => setStudentUsername(e.target.value)} />
                 </div>
                 <div className="field">
-                  <label>Password (surname)</label>
-                  <PasswordInput slashWhenHidden placeholder="e.g. Okafor" value={studentPassword} onChange={e => setStudentPassword(e.target.value)} />
+                  <label>Password (your first name)</label>
+                  <PasswordInput slashWhenHidden placeholder="e.g. Elijah" value={studentPassword} onChange={e => setStudentPassword(e.target.value)} />
                 </div>
                 {studentError && <div className="error-text">{studentError}</div>}
                 <button type="submit" className="auth-submit" disabled={studentChecking}>
@@ -363,7 +363,7 @@ export default function Login() {
                 </button>
                 <div className="student-portal-notice">
                   <GraduationCap size={16} />
-                  <span>Your username and surname are given to you by your school admin — you don't need to register.</span>
+                  <span>Your username is given to you by your school admin. Your password is your first name, capital first letter then small letters (Elijah). You don't need to register.</span>
                 </div>
               </form>
             )}

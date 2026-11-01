@@ -11,6 +11,7 @@ import { useClassSetup } from '../context/ClassSetupContext';
 import { useSchool } from '../context/SchoolContext';
 import { useScrollHandoff } from '../lib/useScrollHandoff';
 import { createStudent, updateStudent, deleteStudent } from '../lib/students';
+import { passwordFromName } from '../lib/studentPassword';
 import { nextUsername, studentSequence, STUDENT_STATUSES, normaliseStatus, statusLabel, statusBadgeTone } from '../data/mockData';
 
 export default function Students({ students, setStudents, questions = [], license, setLicense }) {
@@ -83,7 +84,7 @@ export default function Students({ students, setStudents, questions = [], licens
     try {
       if (editing === 'new') {
         const username = nextUsername(studentSequence(students), form.class, school.code);
-        const surname = form.name.trim().split(' ').slice(-1)[0];
+        const surname = passwordFromName(form.name);
         const saved = await createStudent(school.id, {
           name: form.name.trim(), username, surname,
           class: form.class, subjects: form.subjects, status: form.status,
