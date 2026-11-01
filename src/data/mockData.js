@@ -56,7 +56,7 @@ export const STUDENT_STATUSES = ['pending', 'test-active', 'suspended'];
 export const normaliseStatus = (s) => (s === 'exam-active' ? 'test-active' : s);
 
 export function statusLabel(status) {
-  const labels = { pending: 'Pending', 'test-active': 'Test Active', 'exam-active': 'Test Active', suspended: 'Suspended' };
+  const labels = { pending: 'Pending', 'test-active': 'Active', 'exam-active': 'Active', suspended: 'Suspended' };
   return labels[status] || status;
 }
 

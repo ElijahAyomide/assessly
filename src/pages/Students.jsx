@@ -243,7 +243,7 @@ export default function Students({ students, setStudents, questions = [], licens
                     <td><Badge tone={statusBadgeTone(s.status)}>{statusLabel(s.status)}</Badge></td>
                     <td>
                       <div className="row-actions row-actions-menu" onClick={e => e.stopPropagation()}>
-                        <button className="link-btn" onClick={() => openEdit(s)}>View profile</button>
+                        <button className="link-btn" onClick={() => openEdit(s)}>View</button>
                         <button className="icon-btn icon-btn-plain" onClick={() => setMenuFor(menuFor === s.id ? null : s.id)} aria-label="More actions"><MoreHorizontal size={16} /></button>
                         {menuFor === s.id && (
                           <div className="row-menu">
@@ -305,7 +305,7 @@ export default function Students({ students, setStudents, questions = [], licens
               <select value={normaliseStatus(form.status)} onChange={e => setForm({ ...form, status: e.target.value })}>
                 {STUDENT_STATUSES.map(s => <option key={s} value={s}>{statusLabel(s)}</option>)}
               </select>
-              <div className="field-hint">Test Active is normally set automatically when you set a test from the Dashboard — changing it here overrides that manually.</div>
+              <div className="field-hint">Active is normally set automatically when you set a test from the Dashboard — changing it here overrides that manually.</div>
             </div>
             {error && <div className="error-text">{error}</div>}
             <button type="submit" className="btn-primary" disabled={saving}>

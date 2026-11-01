@@ -440,7 +440,7 @@ export default function Dashboard({ students, setStudents, questions, setQuestio
               <label>Status</label>
               <select value={editForm.status === 'exam-active' ? 'test-active' : editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })}>
                 <option value="pending">Pending</option>
-                <option value="test-active">Test Active</option>
+                <option value="test-active">Active</option>
                 <option value="suspended">Suspended</option>
               </select>
             </div>

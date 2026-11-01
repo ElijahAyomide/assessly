@@ -295,7 +295,7 @@ export default function Results({ results, setResults, license }) {
                             <td className="sitting-total"><b>{row.score} / {row.max}</b><span className="cell-sub">{pctText(row.pct)}</span></td>
                             <td>
                               <div className="report-cell">
-                                <button className="link-btn" onClick={() => startPrint({ kind: 'slip', username: row.username })}>View result</button>
+                                <button className="link-btn" onClick={() => startPrint({ kind: 'slip', username: row.username })}>View</button>
                                 <button className="row-delete" title={`Delete all ${row.items.length} results`} aria-label={`Delete all of ${row.studentName}'s results from this sitting`} onClick={() => askDelete(row.items)}><Trash2 size={15} /></button>
                               </div>
                             </td>
@@ -342,7 +342,7 @@ export default function Results({ results, setResults, license }) {
                           <td className="cell-strong">{r.score} / {r.total}</td>
                           <td>
                             <div className="report-cell">
-                              <button className="link-btn" onClick={() => startPrint({ kind: 'slip', username: r.username })}>View result</button>
+                              <button className="link-btn" onClick={() => startPrint({ kind: 'slip', username: r.username })}>View</button>
                               <button className="row-delete" title="Delete this result" aria-label={`Delete ${r.studentName}'s ${r.subject} result`} onClick={() => askDelete([r])}><Trash2 size={15} /></button>
                             </div>
                           </td>

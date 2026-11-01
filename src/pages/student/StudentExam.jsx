@@ -126,22 +126,15 @@ export default function StudentExam() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentToken, groupId]);
 
-  // After a submit there is no review page and no Continue button: if the
-  // student has other subjects still to take they go straight to their home
-  // page; if nothing is left they are signed out right away.
-  const leaveAfterSubmit = async () => {
-    try {
-      const d = await studentApi.home(studentToken);
-      if (!d.assignments.some(a => a.status === 'todo')) {
-        studentApi.logout(studentToken).catch(() => {});
-        setStudentToken(null);
-        navigate('/login', { replace: true });
-        return;
-      }
-    } catch (err) {
-      if (err.status === 401) { sessionExpired(); return; }
-    }
-    navigate('/student', { replace: true });
+  // After a submit the student sees "Test submitted successfully" for 3 seconds
+  // and is then signed out. (Signing out also closes the submitted work and
+  // puts the student's status back to Pending on the server.)
+  const leaveAfterSubmit = () => {
+    setTimeout(() => {
+      studentApi.logout(studentToken).catch(() => {});
+      setStudentToken(null);
+      navigate('/login', { replace: true });
+    }, 3000);
   };
 
   // One Submit for every subject. The server does the grading.
@@ -223,8 +216,9 @@ export default function StudentExam() {
       <div className="sp-exam-screen sp-exam-center">
         <div className="sp-result-card">
           <div className="sp-result-icon"><CheckCircle2 size={28} /></div>
-          <div className="sp-result-title">Submitted successfully</div>
+          <div className="sp-result-title">Test submitted successfully</div>
           <div className="sp-result-detail">{subjects.map(s => s.subject).join(' · ')}</div>
+          <div className="sp-result-detail">You will be logged out in a moment.</div>
         </div>
       </div>
     );
@@ -236,7 +230,6 @@ export default function StudentExam() {
   const activeAnswers = answers[active.id] || {};
   const lowTime = secondsLeft <= 180;   // last 3 minutes
   const countFor = (s) => Object.keys(answers[s.id] || {}).length;
-  const unanswered = subjects.reduce((n, s) => n + (s.questions.length - countFor(s)), 0);
   const setPos = (i) => setPositions(p => ({ ...p, [active.id]: i }));
   const activeIndex = subjects.findIndex(s => s.id === active.id);
   const nextSubject = subjects[activeIndex + 1];
@@ -346,7 +339,7 @@ export default function StudentExam() {
       </div>
 
       {confirmingSubmit && (
-        <Modal title="Submit all subjects?" onClose={() => setConfirmingSubmit(false)} width={420}>
+        <Modal title="Are you sure you want to submit?" onClose={() => setConfirmingSubmit(false)} width={420}>
           <div className="submit-summary">
             {subjects.map(s => (
               <div key={s.id} className="submit-summary-row">
@@ -356,12 +349,11 @@ export default function StudentExam() {
             ))}
           </div>
           <p className="confirm-text">
-            {unanswered > 0 ? `${unanswered} unanswered question${unanswered === 1 ? '' : 's'} will be marked wrong. ` : ''}
-            After you submit you can only look back at your answers, not change them.
+            You will be logged out immediately after you submit, and you will not be able to change your answers.
           </p>
           <div className="confirm-actions">
             <button className="btn-ghost" onClick={() => setConfirmingSubmit(false)}>Keep working</button>
-            <button className="btn-primary" onClick={() => { setConfirmingSubmit(false); doSubmit(); }}>Submit all</button>
+            <button className="btn-primary" onClick={() => { setConfirmingSubmit(false); doSubmit(); }}>Yes, submit</button>
           </div>
         </Modal>
       )}
