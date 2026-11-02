@@ -49,19 +49,19 @@ export function nextUsername(existingCount, className, schoolCode = SCHOOL.code)
 // - pending: added, but no test or exam has been assigned
 // - test-active: admin has assigned a question set they can now take from their login
 // - exam-active: same as test-active (older records)
-// - suspended: manually blocked by the admin, regardless of assignment
 // 'test-active' now simply means "has a question set assigned". Older students
 // may still carry 'exam-active'; it is shown and treated the same way.
-export const STUDENT_STATUSES = ['pending', 'test-active', 'suspended'];
-export const normaliseStatus = (s) => (s === 'exam-active' ? 'test-active' : s);
+export const STUDENT_STATUSES = ['pending', 'test-active'];
+// Older records: 'exam-active' means Active; 'suspended' no longer exists (shown as Pending).
+export const normaliseStatus = (s) => (s === 'exam-active' ? 'test-active' : s === 'suspended' ? 'pending' : s);
 
 export function statusLabel(status) {
-  const labels = { pending: 'Pending', 'test-active': 'Active', 'exam-active': 'Active', suspended: 'Suspended' };
+  const labels = { pending: 'Pending', 'test-active': 'Active', 'exam-active': 'Active', suspended: 'Pending' };
   return labels[status] || status;
 }
 
 export function statusBadgeTone(status) {
-  const tones = { pending: 'amber', 'test-active': 'green-light', 'exam-active': 'green-light', suspended: 'red' };
+  const tones = { pending: 'amber', 'test-active': 'green-light', 'exam-active': 'green-light', suspended: 'amber' };
   return tones[status] || 'default';
 }
 

@@ -78,7 +78,7 @@ export default function Dashboard({ students, setStudents, questions, setQuestio
     setEditError('');
     try {
       const saved = await updateStudent(viewingStudent.id, {
-        name: editForm.name.trim(), class: editForm.class, subjects: editForm.subjects, status: editForm.status,
+        name: editForm.name.trim(), class: editForm.class, subjects: editForm.subjects,
       });
       setStudents(prev => prev.map(s => s.id === viewingStudent.id ? { ...s, ...saved, assignments: s.assignments } : s));
       setViewingStudent(null);
@@ -439,11 +439,8 @@ export default function Dashboard({ students, setStudents, questions, setQuestio
             </div>
             <div className="field">
               <label>Status</label>
-              <select value={editForm.status === 'exam-active' ? 'test-active' : editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })}>
-                <option value="pending">Pending</option>
-                <option value="test-active">Active</option>
-                <option value="suspended">Suspended</option>
-              </select>
+              <input type="text" value={statusLabel(editForm.status)} disabled readOnly />
+              <div className="field-hint">Changes by itself: Active once a test is set, back to Pending after the student submits.</div>
             </div>
             {editError && <div className="error-text">{editError}</div>}
             <button type="submit" className="btn-primary" disabled={savingEdit}>{savingEdit ? 'Saving…' : 'Save Changes'}</button>

@@ -64,7 +64,7 @@ export default function Students({ students, setStudents, questions = [], licens
   };
 
   const openEdit = (student) => {
-    setForm({ name: student.name, class: student.class, subjects: student.subjects, status: student.status });
+    setForm({ name: student.name, class: student.class, subjects: student.subjects, status: normaliseStatus(student.status) });
     setError('');
     setEditing(student);
   };
@@ -87,12 +87,12 @@ export default function Students({ students, setStudents, questions = [], licens
         const surname = passwordFromName(form.name);
         const saved = await createStudent(school.id, {
           name: form.name.trim(), username, surname,
-          class: form.class, subjects: form.subjects, status: form.status,
+          class: form.class, subjects: form.subjects, status: 'pending',
         });
         setStudents(prev => [...prev, saved]);
       } else {
         const saved = await updateStudent(editing.id, {
-          name: form.name.trim(), class: form.class, subjects: form.subjects, status: form.status,
+          name: form.name.trim(), class: form.class, subjects: form.subjects,
         });
         setStudents(prev => prev.map(s => s.id === editing.id ? { ...s, ...saved, assignments: s.assignments } : s));
       }
@@ -118,7 +118,7 @@ export default function Students({ students, setStudents, questions = [], licens
   const subjectPool = subjectPoolForClass(form.class);
   const classOptions = [...new Set([...CLASSES, ...students.map(s => s.class)])];
 
-  const activeCount = students.filter(s => s.status !== 'suspended').length;
+  const activeCount = students.filter(s => normaliseStatus(s.status) === 'test-active').length;
   const focusClass = classFilter !== 'all' ? classFilter : null;
   const inFocusClass = focusClass ? students.filter(s => s.class === focusClass).length : 0;
   const initials = (name) => name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
@@ -301,13 +301,13 @@ export default function Students({ students, setStudents, questions = [], licens
                 ))}
               </div>
             </div>
-            <div className="field">
-              <label>Status</label>
-              <select value={normaliseStatus(form.status)} onChange={e => setForm({ ...form, status: e.target.value })}>
-                {STUDENT_STATUSES.map(s => <option key={s} value={s}>{statusLabel(s)}</option>)}
-              </select>
-              <div className="field-hint">Active is normally set automatically when you set a test from the Dashboard — changing it here overrides that manually.</div>
-            </div>
+            {editing !== 'new' && (
+              <div className="field">
+                <label>Status</label>
+                <input type="text" value={statusLabel(form.status)} disabled readOnly />
+                <div className="field-hint">The status changes by itself: Pending until a test is set for the student, Active while they have a test to take, and back to Pending after they submit.</div>
+              </div>
+            )}
             {error && <div className="error-text">{error}</div>}
             <button type="submit" className="btn-primary" disabled={saving}>
               {saving ? 'Saving…' : editing === 'new' ? 'Add Student' : 'Save Changes'}
